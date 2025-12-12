@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}My Medicines - PharmaCare{% endblock %}
+
+{% block body %}
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-capsule"></i> My Medicine Inventory</h1>
+</div>
+
+<div class="animate-fade-in">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-list-ul me-2"></i>Available Products</span>
+            <a href="{{ path('supplier_add_medicine') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>Add Medicine
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                {% for item in inventory %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h5 class="card-title mb-1">{{ item.medicine.name }}</h5>
+                                    <span class="badge bg-secondary">{{ item.medicine.category }}</span>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <p class="card-text text-muted small mb-3">{{ item.medicine.description|slice(0, 100) }}...</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small">Stock Quantity:</span>
+                                {% if item.quantity < 50 %}
+                                    <span class="badge bg-danger fs-6">{{ item.quantity }}</span>
+                                {% elseif item.quantity < 100 %}
+                                    <span class="badge bg-warning fs-6">{{ item.quantity }}</span>
+                                {% else %}
+                                    <span class="badge bg-success fs-6">{{ item.quantity }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="text-muted small">Wholesale Price:</span>
+                                <strong class="text-primary">TND {{ item.wholesalePrice }}</strong>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted small">Last Restocked:</span>
+                                <small>{{ item.lastRestocked|date('M d, Y') }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-light border-0">
+                            <button class="btn btn-outline-primary btn-sm w-100">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Restock
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-inbox display-1 text-muted mb-3"></i>
+                        <h3>No medicines in inventory</h3>
+                        <p class="text-muted">Start adding medicines to your supplier inventory</p>
+                        <a href="{{ path('supplier_add_medicine') }}" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-circle me-1"></i>Add Your First Medicine
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

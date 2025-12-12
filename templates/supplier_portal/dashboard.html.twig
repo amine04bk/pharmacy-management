@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Supplier Dashboard - PharmaCare{% endblock %}
+
+{% block body %}
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-truck"></i> Supplier Dashboard</h1>
+</div>
+
+<div class="animate-fade-in">
+    <!-- Statistics Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ inventory_count }}</h3>
+                        <p><i class="bi bi-capsule me-2"></i>Products Available</p>
+                    </div>
+                    <i class="bi bi-capsule"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card danger">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ low_stock_count }}</h3>
+                        <p><i class="bi bi-exclamation-triangle me-2"></i>Low Stock Alert</p>
+                    </div>
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>TND {{ total_value|number_format(2) }}</h3>
+                        <p><i class="bi bi-currency-dollar me-2"></i>Inventory Value</p>
+                    </div>
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card info">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|length }}</h3>
+                        <p><i class="bi bi-cart-check me-2"></i>Total Orders</p>
+                    </div>
+                    <i class="bi bi-cart"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-clock-history me-2"></i>Recent Orders</span>
+                    <a href="{{ path('supplier_orders') }}" class="btn btn-sm btn-light">
+                        <i class="bi bi-arrow-right me-1"></i>View All
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#ID</th>
+                                    <th>Medicine</th>
+                                    <th>Quantity</th>
+                                    <th>Order Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><strong>#{{ order.id }}</strong></td>
+                                    <td>{{ order.medicine.name }}</td>
+                                    <td><span class="badge bg-info">{{ order.quantity }}</span></td>
+                                    <td>{{ order.orderDate|date('M d, Y') }}</td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elseif order.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('order_show', {id: order.id}) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                        No orders yet
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

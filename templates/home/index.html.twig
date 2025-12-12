@@ -1,0 +1,215 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard - PharmaCare{% endblock %}
+
+{% block body %}
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-speedometer2"></i> Admin Dashboard</h1>
+</div>
+
+<div class="animate-fade-in">
+    <!-- User Statistics Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.total_users }}</h3>
+                        <p><i class="bi bi-people-fill me-2"></i>Total Users</p>
+                    </div>
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.total_pharmacies }}</h3>
+                        <p><i class="bi bi-hospital me-2"></i>Pharmacies</p>
+                    </div>
+                    <i class="bi bi-hospital"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card secondary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.total_suppliers }}</h3>
+                        <p><i class="bi bi-truck me-2"></i>Suppliers</p>
+                    </div>
+                    <i class="bi bi-truck"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card warning">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.total_delivery }}</h3>
+                        <p><i class="bi bi-bicycle me-2"></i>Delivery Staff</p>
+                    </div>
+                    <i class="bi bi-bicycle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Statistics Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card info">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.total_medicines }}</h3>
+                        <p><i class="bi bi-capsule-pill me-2"></i>Total Medicines</p>
+                    </div>
+                    <i class="bi bi-capsule"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card danger">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.low_stock_medicines }}</h3>
+                        <p><i class="bi bi-exclamation-triangle me-2"></i>Low Stock Alert</p>
+                    </div>
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card warning">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.expiring_soon }}</h3>
+                        <p><i class="bi bi-calendar-x me-2"></i>Expiring Soon</p>
+                    </div>
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ stats.pending_orders }}</h3>
+                        <p><i class="bi bi-cart-check me-2"></i>Pending Orders</p>
+                    </div>
+                    <i class="bi bi-cart"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Inventory Value -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="stat-card primary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3>TND {{ stats.total_inventory_value|number_format(2, '.', ',') }}</h3>
+                        <p><i class="bi bi-currency-dollar me-2"></i>Total Inventory Value</p>
+                    </div>
+                    <i class="bi bi-cash-stack"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Tables Row -->
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-cart-check me-2"></i>Recent Orders</span>
+                    <a href="{{ path('order_index') }}" class="btn btn-sm btn-light">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Medicine</th>
+                                    <th>Supplier</th>
+                                    <th>Qty</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in recent_orders %}
+                                <tr>
+                                    <td><strong>{{ order.medicine.name }}</strong></td>
+                                    <td>{{ order.supplier.name }}</td>
+                                    <td><span class="badge bg-info">{{ order.quantity }}</span></td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elseif order.status == 'completed' %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-4">
+                                        <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                        No orders found
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-exclamation-triangle me-2"></i>Low Stock Alerts</span>
+                    <a href="{{ path('medicine_index') }}" class="btn btn-sm btn-light">View All</a>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Medicine Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for medicine in low_stock_medicines %}
+                                <tr>
+                                    <td><strong>{{ medicine.name }}</strong></td>
+                                    <td><span class="badge bg-secondary">{{ medicine.category }}</span></td>
+                                    <td>
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-exclamation-circle me-1"></i>{{ medicine.quantity }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted py-4">
+                                        <i class="bi bi-check-circle display-4 d-block mb-2"></i>
+                                        All medicines are well stocked
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

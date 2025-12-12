@@ -1,0 +1,177 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Management - PharmaCare{% endblock %}
+
+{% block body %}
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-people"></i> User Management</h1>
+</div>
+
+<div class="animate-fade-in">
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <a href="{{ path('admin_users_by_role', {role: 'ROLE_ADMIN'}) }}" class="text-decoration-none">
+                <div class="stat-card primary">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ users|filter(u => 'ROLE_ADMIN' in u.roles)|length }}</h3>
+                            <p><i class="bi bi-shield-check me-2"></i>Administrators</p>
+                        </div>
+                        <i class="bi bi-shield"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ path('admin_users_by_role', {role: 'ROLE_PHARMACY'}) }}" class="text-decoration-none">
+                <div class="stat-card success">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ users|filter(u => 'ROLE_PHARMACY' in u.roles)|length }}</h3>
+                            <p><i class="bi bi-hospital me-2"></i>Pharmacies</p>
+                        </div>
+                        <i class="bi bi-hospital"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ path('admin_users_by_role', {role: 'ROLE_SUPPLIER'}) }}" class="text-decoration-none">
+                <div class="stat-card secondary">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ users|filter(u => 'ROLE_SUPPLIER' in u.roles)|length }}</h3>
+                            <p><i class="bi bi-truck me-2"></i>Suppliers</p>
+                        </div>
+                        <i class="bi bi-truck"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-3">
+            <a href="{{ path('admin_users_by_role', {role: 'ROLE_DELIVERY'}) }}" class="text-decoration-none">
+                <div class="stat-card warning">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h3>{{ users|filter(u => 'ROLE_DELIVERY' in u.roles)|length }}</h3>
+                            <p><i class="bi bi-bicycle me-2"></i>Delivery</p>
+                        </div>
+                        <i class="bi bi-bicycle"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-list me-2"></i>All Users ({{ users|length }})</span>
+            <div class="d-flex gap-2">
+                <input type="search" class="form-control form-control-sm" placeholder="Search users..." id="searchUsers">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-filter"></i> Filter
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{{ path('admin_users_index') }}">All Users</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ path('admin_users_by_role', {role: 'ROLE_ADMIN'}) }}">Admins</a></li>
+                        <li><a class="dropdown-item" href="{{ path('admin_users_by_role', {role: 'ROLE_PHARMACY'}) }}">Pharmacies</a></li>
+                        <li><a class="dropdown-item" href="{{ path('admin_users_by_role', {role: 'ROLE_SUPPLIER'}) }}">Suppliers</a></li>
+                        <li><a class="dropdown-item" href="{{ path('admin_users_by_role', {role: 'ROLE_DELIVERY'}) }}">Delivery</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>City</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td><strong>#{{ user.id }}</strong></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-circle fs-4 text-primary me-2"></i>
+                                    <strong>{{ user.name }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if 'ROLE_ADMIN' in user.roles %}
+                                    <span class="badge bg-primary">Admin</span>
+                                {% elseif 'ROLE_PHARMACY' in user.roles %}
+                                    <span class="badge bg-success">Pharmacy</span>
+                                {% elseif 'ROLE_SUPPLIER' in user.roles %}
+                                    <span class="badge bg-info">Supplier</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Delivery</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.city ?? '-' }}</td>
+                            <td>{{ user.phone }}</td>
+                            <td>
+                                {% if user.isActive %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Active
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i>Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('admin_users_edit', {id: user.id}) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('admin_users_toggle_active', {id: user.id}) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" 
+                                                title="{{ user.isActive ? 'Deactivate' : 'Activate' }}">
+                                            <i class="bi bi-{{ user.isActive ? 'toggle-on' : 'toggle-off' }}"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{{ path('admin_users_delete', {id: user.id}) }}" 
+                                          onsubmit="return confirm('Are you sure you want to delete this user?')" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('searchUsers').addEventListener('keyup', function() {
+    var input = this.value.toLowerCase();
+    var rows = document.querySelectorAll('#usersTable tbody tr');
+    
+    rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

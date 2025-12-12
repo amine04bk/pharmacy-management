@@ -1,0 +1,203 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Orders Management - PharmaCare{% endblock %}
+
+{% block body %}
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-cart"></i> Orders Management</h1>
+</div>
+
+<div class="animate-fade-in">
+    <!-- Quick Stats -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="stat-card primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|length }}</h3>
+                        <p><i class="bi bi-cart me-2"></i>Total Orders</p>
+                    </div>
+                    <i class="bi bi-cart"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card warning">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|filter(o => o.status == 'pending')|length }}</h3>
+                        <p><i class="bi bi-clock me-2"></i>Pending</p>
+                    </div>
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|filter(o => o.status == 'completed')|length }}</h3>
+                        <p><i class="bi bi-check-circle me-2"></i>Completed</p>
+                    </div>
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card danger">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|filter(o => o.status == 'cancelled')|length }}</h3>
+                        <p><i class="bi bi-x-circle me-2"></i>Cancelled</p>
+                    </div>
+                    <i class="bi bi-x-circle"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-list me-2"></i>All Orders</span>
+            <div class="d-flex gap-2">
+                <input type="search" class="form-control form-control-sm" placeholder="Search orders..." id="searchOrders">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-filter"></i> Status
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item filter-status" href="#" data-status="all">All Statuses</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item filter-status" href="#" data-status="pending">Pending</a></li>
+                        <li><a class="dropdown-item filter-status" href="#" data-status="completed">Completed</a></li>
+                        <li><a class="dropdown-item filter-status" href="#" data-status="cancelled">Cancelled</a></li>
+                    </ul>
+                </div>
+                <a href="{{ path('order_new') }}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>New Order
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if orders|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Medicine</th>
+                            <th>Supplier</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr data-status="{{ order.status }}">
+                            <td><strong>#{{ order.id }}</strong></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-capsule text-primary me-2"></i>
+                                    <strong>{{ order.medicine.name }}</strong>
+                                </div>
+                            </td>
+                            <td>
+                                <i class="bi bi-truck text-secondary me-1"></i>
+                                {{ order.supplier.name }}
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ order.quantity }}</span>
+                            </td>
+                            <td>
+                                <strong>{{ (order.quantity * order.medicine.price)|number_format(2) }} TND</strong>
+                            </td>
+                            <td>
+                                <i class="bi bi-calendar me-1"></i>
+                                {{ order.orderDate|date('Y-m-d H:i') }}
+                            </td>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-clock me-1"></i>Pending
+                                    </span>
+                                {% elseif order.status == 'completed' %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Completed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i>Cancelled
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('order_show', {id: order.id}) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if order.status == 'pending' %}
+                                    <form method="post" action="{{ path('order_complete', {id: order.id}) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-success" title="Mark as Completed">
+                                            <i class="bi bi-check"></i>
+                                        </button>
+                                    </form>
+                                    <form method="post" action="{{ path('order_cancel', {id: order.id}) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Cancel Order">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="bi bi-cart display-1 text-muted mb-3 d-block"></i>
+                <p class="text-muted mb-3">No orders found.</p>
+                <a href="{{ path('order_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Create First Order
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Search functionality
+document.getElementById('searchOrders').addEventListener('keyup', function() {
+    var input = this.value.toLowerCase();
+    var rows = document.querySelectorAll('#ordersTable tbody tr');
+    
+    rows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+    });
+});
+
+// Status filter
+document.querySelectorAll('.filter-status').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var status = this.dataset.status;
+        var rows = document.querySelectorAll('#ordersTable tbody tr');
+        
+        rows.forEach(function(row) {
+            if (status === 'all' || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

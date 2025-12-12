@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Supplier Orders - PharmaCare{% endblock %}
+
+{% block body %}
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-cart-check"></i> Order Management</h1>
+</div>
+
+<div class="animate-fade-in">
+    <!-- Order Statistics -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card warning">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|filter(o => o.status == 'pending')|length }}</h3>
+                        <p><i class="bi bi-clock me-2"></i>Pending Orders</p>
+                    </div>
+                    <i class="bi bi-clock"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card success">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|filter(o => o.status == 'completed')|length }}</h3>
+                        <p><i class="bi bi-check-circle me-2"></i>Completed</p>
+                    </div>
+                    <i class="bi bi-check-circle"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card primary">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ orders|length }}</h3>
+                        <p><i class="bi bi-cart me-2"></i>Total Orders</p>
+                    </div>
+                    <i class="bi bi-cart"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="card">
+        <div class="card-header">
+            <i class="bi bi-list-check me-2"></i>All Orders
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Medicine</th>
+                            <th>Quantity</th>
+                            <th>Order Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td><strong>#{{ order.id }}</strong></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-capsule-pill text-primary me-2"></i>
+                                    <div>
+                                        <strong>{{ order.medicine.name }}</strong>
+                                        <br><small class="text-muted">{{ order.medicine.category }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge bg-info">{{ order.quantity }} units</span></td>
+                            <td>{{ order.orderDate|date('M d, Y H:i') }}</td>
+                            <td>
+                                {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning">
+                                        <i class="bi bi-clock me-1"></i>Pending
+                                    </span>
+                                {% elseif order.status == 'completed' %}
+                                    <span class="badge bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>Completed
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i>Cancelled
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('order_show', {id: order.id}) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    {% if order.status == 'pending' %}
+                                    <button type="button" class="btn btn-sm btn-outline-success" 
+                                            onclick="updateStatus({{ order.id }}, 'completed')">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger"
+                                            onclick="updateStatus({{ order.id }}, 'cancelled')">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-inbox display-3 d-block mb-3"></i>
+                                <h5>No orders received yet</h5>
+                                <p>Orders from pharmacies will appear here</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateStatus(orderId, status) {
+    if (confirm('Are you sure you want to update this order status?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ path('order_update_status', {id: '__ID__'}) }}'.replace('__ID__', orderId);
+        
+        const statusInput = document.createElement('input');
+        statusInput.type = 'hidden';
+        statusInput.name = 'status';
+        statusInput.value = status;
+        form.appendChild(statusInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

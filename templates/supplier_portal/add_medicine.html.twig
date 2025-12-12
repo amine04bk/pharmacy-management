@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Add Medicine - PharmaCare{% endblock %}
+
+{% block body %}
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-plus-circle"></i> Add Medicine to Inventory</h1>
+</div>
+
+<div class="animate-fade-in">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <i class="bi bi-capsule me-2"></i>Medicine Details
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        <div class="mb-4">
+                            <label for="medicine_id" class="form-label">
+                                <i class="bi bi-search me-2"></i>Select Medicine
+                            </label>
+                            <select class="form-select" id="medicine_id" name="medicine_id" required>
+                                <option value="">Choose a medicine...</option>
+                                {% for medicine in medicines %}
+                                <option value="{{ medicine.id }}">{{ medicine.name }} - {{ medicine.category }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Select from the available medicine catalog</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="quantity" class="form-label">
+                                    <i class="bi bi-box-seam me-2"></i>Quantity
+                                </label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       placeholder="Enter quantity" min="1" required>
+                                <div class="form-text">How many units do you have in stock?</div>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="wholesale_price" class="form-label">
+                                    <i class="bi bi-currency-dollar me-2"></i>Wholesale Price (TND)
+                                </label>
+                                <input type="number" class="form-control" id="wholesale_price" name="wholesale_price" 
+                                       placeholder="0.00" step="0.01" min="0" required>
+                                <div class="form-text">Price per unit in Tunisian Dinar</div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Add to Inventory
+                            </button>
+                            <a href="{{ path('supplier_medicines') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
