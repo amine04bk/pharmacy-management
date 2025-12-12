@@ -9,6 +9,23 @@
 /vendor/
 ###< symfony/framework-bundle ###
 
+# Environment and Security Files
+.env
+.env.production
+.env.*.local
+
 # SSL Certificates
 /var/ssl/
-.env
+*.pem
+*.key
+*.crt
+
+# Database
+*.sqlite
+*.db
+
+# Credentials and Secrets
+/config/secrets/
+*.p12
+id_rsa*
+*.ppk
