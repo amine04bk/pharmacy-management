@@ -13,6 +13,7 @@
 .env
 .env.production
 .env.*.local
+!.env.dist
 
 # SSL Certificates
 /var/ssl/
