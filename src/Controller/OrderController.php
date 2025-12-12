@@ -47,9 +47,15 @@ class OrderController extends AbstractController
         SupplierRepository $supplierRepository
     ): Response {
         if ($request->isMethod('POST')) {
-            $medicineId = $request->request->get('medicine_id');
-            $supplierId = $request->request->get('supplier_id');
+            $medicineId = $request->request->get('medicine');
+            $supplierId = $request->request->get('supplier');
             $quantity = $request->request->get('quantity');
+
+            // Validate that IDs are provided
+            if (!$medicineId || !$supplierId || !$quantity) {
+                $this->addFlash('error', 'Please fill in all required fields');
+                return $this->redirectToRoute('order_new');
+            }
 
             $medicine = $medicineRepository->find($medicineId);
             $supplier = $supplierRepository->find($supplierId);
