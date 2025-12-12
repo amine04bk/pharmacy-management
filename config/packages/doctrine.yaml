@@ -23,6 +23,11 @@ doctrine:
                 prefix: 'App\Entity'
                 alias: App
 
+services:
+    App\EventSubscriber\DatabaseSSLSubscriber:
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+
 when@test:
     doctrine:
         dbal:

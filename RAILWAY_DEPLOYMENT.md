@@ -31,17 +31,43 @@ Go to your project → Variables tab and add:
 APP_ENV=prod
 APP_DEBUG=0
 APP_SECRET=your-generated-secret-here
-DATABASE_URL=mysql://user:pass@host:port/dbname?serverVersion=8.0&charset=utf8mb4
 
-# If using Aiven MySQL with SSL:
-DATABASE_URL=mysql://user:password@host.aivencloud.com:port/dbname?serverVersion=8.0&charset=utf8mb4&sslmode=verify-ca&sslrootcert=/app/ca.pem
+# For Aiven MySQL with SSL
+# Note: The application automatically creates the SSL certificate file from DATABASE_SSL_CA
+# Replace with your actual Aiven credentials
+DATABASE_URL=mysql://user:password@host.aivencloud.com:port/defaultdb?serverVersion=8.0&charset=utf8mb4&driverOptions[1009]=var/ssl/ca.pem&driverOptions[1014]=false
+
+# Aiven SSL Certificate (paste your full certificate content below)
+# The Kernel will automatically write this to var/ssl/ca.pem on boot
+DATABASE_SSL_CA=-----BEGIN CERTIFICATE-----
+MIIEUDCCArigAwIBAgIUMM1iUEUcLWoc566hsYfZPVIOHyowDQYJKoZIhvcNAQEM
+BQAwQDE+MDwGA1UEAww1MWJlN2FhOTEtYTcxZS00OGEzLWExMjctYWFiNjcyMmE5
+YjNkIEdFTiAxIFByb2plY3QgQ0EwHhcNMjUxMjEwMjIxNDAxWhcNMzUxMjA4MjIx
+NDAxWjBAMT4wPAYDVQQDDDUxYmU3YWE5MS1hNzFlLTQ4YTMtYTEyNy1hYWI2NzIy
+YTliM2QgR0VOIDEgUHJvamVjdCBDQTCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCC
+AYoCggGBALXuPxd6nvaRfLTKM5XaO5Z+5RUmf54vipTk3o2+zHFQA3OviNRHt3yc
+epMjk7TdldQP8DmPsRQNy3jVxILukS6wMyCyeYv3ulK+iE00gYatuernrwBVmjxL
+l/qSiiXqEgnER0hUqr17buLJb9oIahz4t9oAVHRdmUz2Gq6UvbFNF6SO00qXZdb8
+5gTLZfUKHjVG59PKq0qUR9/YUh5IRLKjBO4zdMHBZDBvjNV3Gk1S07bDhcNlMgYC
+X/yp5REEpsPYTw+Pv8Bifuna4nPcMxzXy+WAzPm1IGahfCj2ug+kAnEXCx5BUNWF
+u55+3LkV0pgT5WIdOIkhk/t1uNxdEfPpdZcb1+ynkxw5DjfEkOkvv9DXld/YuMWf
+xBOv5KRAHxEszdi6kDdVHv1hVpEN9wmwebQyJmkTirREjQkEnzGztXyX10u6x+xj
+72AfyTrldH0wjDL7f4dKeK+C1zbhtsZ0MgJr7kMakNv6aBFI+OKi2rUHah7jvrAZ
+2PBhheGyowIDAQABo0IwQDAdBgNVHQ4EFgQU7L+dr9+Z7SOQf+TsXJaCHJbGInQw
+EgYDVR0TAQH/BAgwBgEB/wIBADALBgNVHQ8EBAMCAQYwDQYJKoZIhvcNAQEMBQAD
+ggGBAAowLvLykYQ2h+pwO3ysd9Y025iveJ/gdwK0IWsLM6zJFQ0mzmC2ki7P0+iB
+5PQhjBTIJuRjDSArcrYpFalowkhtz87t+zAsOwxN0h87bbcjOfXOt4fWpipFeCqY
+gcGw9H2weW03HJDd7zrN/s2kV5oABxfFw7BHRQSO9AlO2QjkSTty6uBAcBOK92G7
+LZ1UrK1Mxcj7CBMGvqDOe2Roq0hK34QzFkqC4Y59p1cGJFKozRU+j15dCQPRln+T
+IlpTGHdGFASsxk5ZPrmAuNKSDrOVpVInfica0KIk7DjE3KwyNOqvXL2rkukpryOL
+TVbZzPhqlj2dkeFC9/lGg5rb6cax/acuYgaX4A76/doxnnkJMLIOvYevahcbca2G
+QE7pFTnhkgXlnxlmnMkodaoN7ZqzobGWm+zd50BZQWhzB2hajxgr7AsbOIuEvqF/
+YGD0jXa6ZYsi8hgIuqDhyo0Rpyagj9ZhFfTU4UELRX88G4uN+1626+U7DSFGGxpK
+edBpRw==
+-----END CERTIFICATE-----
 ```
 
-### 4. Upload SSL Certificate (if using Aiven)
-```bash
-# In Railway project settings → Files
-# Upload ca.pem to /app/ca.pem
-```
+**Note**: The CA certificate is now stored as an environment variable, eliminating the need to upload files to Railway.
 
 ### 5. Deploy
 ```bash
@@ -102,9 +128,11 @@ railway run php bin/console cache:warmup --env=prod
 ```
 
 ### SSL Certificate Issues
-- Ensure ca.pem is uploaded to /app/ca.pem
-- Verify DATABASE_URL includes sslrootcert path
-- Check sslmode is set to verify-ca
+- Ensure DATABASE_SSL_CA environment variable contains the full certificate (including BEGIN/END lines)
+- The application automatically writes the certificate to `var/ssl/ca.pem` on boot
+- Verify DATABASE_URL includes `driverOptions[1009]=var/ssl/ca.pem&driverOptions[1014]=false`
+- Check that the `var` directory is writable
+- No manual file uploads needed - everything is automated via environment variables
 
 ## Files Added for Railway Deployment
 
